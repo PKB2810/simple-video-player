@@ -134,7 +134,13 @@ class VideoParent extends React.Component<any, State> {
   };
   render() {
     return (
-      <>
+      <section
+        style={{
+          width: '100%',
+          height: '100%',
+          display: 'flex',
+          justifyContent: 'space-around'
+        }}>
         <VideoList
           videoList={this.state.videoList}
           playVideo={this.playVideo}
@@ -147,7 +153,7 @@ class VideoParent extends React.Component<any, State> {
           playPreviousVideo={this.playPreviousVideo}
           playNextVideo={this.playNextVideo}
         />
-      </>
+      </section>
     );
   }
 }
