@@ -1,6 +1,7 @@
 import React from 'react';
 import { IVideoObject } from '../../VideoParent';
 import { Button } from 'reactstrap';
+import VideoDescription from '../VideoDescription';
 interface Props {
   currentVideo: IVideoObject;
   toggleStatus: () => void;
@@ -141,6 +142,8 @@ class VideoPlayer extends React.Component<Props, State> {
               height: '100%'
             }}>
             <div style={{ width: '100%' }}>
+            <h1>{this.props.currentVideo.title}</h1>
+            <h2>{this.props.currentVideo.subtitle}</h2>
               <div style={{ width: '100%' }} onClick={this.setShowControls}>
                 <video
                   width="100%"
@@ -153,6 +156,7 @@ class VideoPlayer extends React.Component<Props, State> {
                   }}
                   onTimeUpdate={e => this.setCurrentTime(e)}
                 />
+               <VideoDescription >Description:{this.props.currentVideo.description}</VideoDescription>
               </div>
               {this.state.showControls && (
                 <div style={{ position: 'absolute', top: '50%', left: '50%' }}>

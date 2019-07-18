@@ -28,8 +28,8 @@ class VideoList extends React.Component<Props, State> {
           {this.props.videoList.map(video => {
             return (
               <ListGroupItem onClick={e => this.props.playVideo(video.source)}>
-                <img src={video.thumb} width="20px" height="20px" />
-                {video.title}
+                <img src={video.thumb} width="100%" height="80%" />
+               <div> {video.title}</div>
               </ListGroupItem>
             );
           })}
