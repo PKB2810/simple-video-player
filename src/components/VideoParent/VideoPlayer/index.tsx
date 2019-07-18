@@ -51,10 +51,10 @@ class VideoPlayer extends React.Component<Props, State> {
   setCurrentTime = (e: any) => {
     // change currentTime of video when slider changes or onTimeUpdate event of video
     if (e.target.type === 'range') {
-      this.props.changeCurrentTime(this.slider.current.value);
-      this.video.current.currentTime = this.slider.current.value;
+      this.props.changeCurrentTime(this.slider.current.value); //set current time to slider value so as it reflects in slider
+      this.video.current.currentTime = this.slider.current.value; //play video from current time set
     } else {
-      this.props.changeCurrentTime(this.video.current.currentTime);
+      this.props.changeCurrentTime(this.video.current.currentTime); //update current time so as to reflect in slider
     }
   };
 
@@ -72,7 +72,24 @@ class VideoPlayer extends React.Component<Props, State> {
       this.video.current.volume = this.state.volume;
     }
   };
-
+  skipForwardBy30Sec = () => {
+    this.slider.current.value =
+      parseFloat(this.slider.current.value) + 30 >
+      parseFloat(this.slider.current.max)
+        ? this.slider.current.max
+        : (parseFloat(this.slider.current.value) + 30).toString();
+    this.props.changeCurrentTime(this.slider.current.value); //set current time to slider value so as it reflects in slider
+    this.video.current.currentTime = this.slider.current.value; //play video from current time set
+  };
+  skipBackBy30Sec = () => {
+    this.slider.current.value =
+      parseFloat(this.slider.current.value) - 30 <
+      parseFloat(this.slider.current.min)
+        ? this.slider.current.min
+        : (parseFloat(this.slider.current.value) - 30).toString();
+    this.props.changeCurrentTime(this.slider.current.value); //set current time to slider value so as it reflects in slider
+    this.video.current.currentTime = this.slider.current.value; //play video from current time set
+  };
   render() {
     if (this.props.currentVideo.source.trim() !== '') {
       return (
@@ -91,7 +108,10 @@ class VideoPlayer extends React.Component<Props, State> {
             />
             {this.props.currentVideo.status ? (
               <>
-                <button onClick={this.props.toggleStatus}>Pause</button>
+                <div>
+                  <button onClick={this.props.toggleStatus}>Pause</button>
+                </div>
+
                 <div className="slidecontainer">
                   <input
                     type="range"
@@ -114,10 +134,17 @@ class VideoPlayer extends React.Component<Props, State> {
                     onChange={this.setVolume}
                   />
                 </div>
+                <div>
+                  <button onClick={this.skipForwardBy30Sec}>+30</button>
+                  <button onClick={this.skipBackBy30Sec}>-30</button>
+                </div>
               </>
             ) : (
               <>
-                <button onClick={this.props.toggleStatus}>Play</button>
+                <div>
+                  <button onClick={this.props.toggleStatus}>Play</button>
+                </div>
+
                 <div className="slidecontainer">
                   <input
                     type="range"
@@ -129,18 +156,21 @@ class VideoPlayer extends React.Component<Props, State> {
                     step="1"
                     onChange={e => this.setCurrentTime(e)}
                   />
-
-                  <div className="volumeSlider">
-                    <input
-                      type="range"
-                      ref={this.volumeSlider}
-                      min="0.0"
-                      max="1.0"
-                      value={this.state.volume}
-                      step="0.1"
-                      onChange={this.setVolume}
-                    />
-                  </div>
+                </div>
+                <div className="volumeSlider">
+                  <input
+                    type="range"
+                    ref={this.volumeSlider}
+                    min="0.0"
+                    max="1.0"
+                    value={this.state.volume}
+                    step="0.1"
+                    onChange={this.setVolume}
+                  />
+                </div>
+                <div>
+                  <button onClick={this.skipForwardBy30Sec}>+30</button>
+                  <button onClick={this.skipBackBy30Sec}>-30</button>
                 </div>
               </>
             )}

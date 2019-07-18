@@ -78,7 +78,6 @@ class VideoParent extends React.Component<any, State> {
   };
 
   changeCurrentTime = (currentTime: any) => {
-    console.log('called');
     this.setState(prevState => ({
       currentVideo: {
         // object that we want to update
