@@ -6,10 +6,14 @@ interface Props {
   toggleStatus: () => void;
   changeCurrentTime: (currentTime: any) => void;
   setDuration: (videoDuration: any) => void;
+  playPreviousVideo: () => void;
+  playNextVideo: () => void;
 }
 
 interface State {
   volume: number;
+  autoPlay: boolean;
+  videoEnded: boolean;
 }
 
 class VideoPlayer extends React.Component<Props, State> {
@@ -24,7 +28,9 @@ class VideoPlayer extends React.Component<Props, State> {
     this.volumeSlider = React.createRef();
   }
   state: State = {
-    volume: 0.5
+    volume: 0.5,
+    autoPlay: false,
+    videoEnded: false
   };
   componentDidMount() {
     if (!this.video.current) return;
@@ -54,7 +60,16 @@ class VideoPlayer extends React.Component<Props, State> {
       this.props.changeCurrentTime(this.slider.current.value); //set current time to slider value so as it reflects in slider
       this.video.current.currentTime = this.slider.current.value; //play video from current time set
     } else {
-      this.props.changeCurrentTime(this.video.current.currentTime); //update current time so as to reflect in slider
+      if (
+        this.video.current.currentTime.toString() ===
+        this.slider.current.max.toString()
+      ) {
+        //     this.setState({ videoEnded: true });
+        this.video.current.pause();
+        this.props.toggleStatus();
+      } else {
+        this.props.changeCurrentTime(this.video.current.currentTime); //update current time so as to reflect in slider
+      }
     }
   };
 
@@ -90,6 +105,10 @@ class VideoPlayer extends React.Component<Props, State> {
     this.props.changeCurrentTime(this.slider.current.value); //set current time to slider value so as it reflects in slider
     this.video.current.currentTime = this.slider.current.value; //play video from current time set
   };
+
+  goFullScreen = () => {
+    this.video.current.webkitEnterFullscreen();
+  };
   render() {
     if (this.props.currentVideo.source.trim() !== '') {
       return (
@@ -109,7 +128,11 @@ class VideoPlayer extends React.Component<Props, State> {
             {this.props.currentVideo.status ? (
               <>
                 <div>
+                  <button onClick={this.props.playPreviousVideo}>
+                    Play Previous
+                  </button>
                   <button onClick={this.props.toggleStatus}>Pause</button>
+                  <button onClick={this.props.playNextVideo}>Play Next</button>
                 </div>
 
                 <div className="slidecontainer">
@@ -138,11 +161,18 @@ class VideoPlayer extends React.Component<Props, State> {
                   <button onClick={this.skipForwardBy30Sec}>+30</button>
                   <button onClick={this.skipBackBy30Sec}>-30</button>
                 </div>
+                <div>
+                  <button onClick={this.goFullScreen}>Fullscreen</button>
+                </div>
               </>
             ) : (
               <>
                 <div>
+                  <button onClick={this.props.playPreviousVideo}>
+                    Play Previous
+                  </button>
                   <button onClick={this.props.toggleStatus}>Play</button>
+                  <button onClick={this.props.playNextVideo}>Play Next</button>
                 </div>
 
                 <div className="slidecontainer">

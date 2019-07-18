@@ -106,6 +106,32 @@ class VideoParent extends React.Component<any, State> {
     });
   };
 
+  playPreviousVideo = (): void => {
+    let index: any = this.state.videoList.findIndex(
+      video => video.source === this.state.currentVideo.source
+    );
+    --index;
+    if (index < 0) {
+      return;
+    } else {
+      this.setState({
+        currentVideo: this.state.videoList[index]
+      });
+    }
+  };
+  playNextVideo = (): void => {
+    let index: any = this.state.videoList.findIndex(
+      video => video.source === this.state.currentVideo.source
+    );
+    ++index;
+    if (index === this.state.videoList.length) {
+      return;
+    } else {
+      this.setState({
+        currentVideo: this.state.videoList[index]
+      });
+    }
+  };
   render() {
     return (
       <>
@@ -118,6 +144,8 @@ class VideoParent extends React.Component<any, State> {
           toggleStatus={this.toggleStatus}
           changeCurrentTime={this.changeCurrentTime}
           setDuration={this.setDuration}
+          playPreviousVideo={this.playPreviousVideo}
+          playNextVideo={this.playNextVideo}
         />
       </>
     );
