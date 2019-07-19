@@ -43,3 +43,8 @@ video::-webkit-media-controls-toggle-closed-captions-button {
 video::-webkit-media-controls-volume-slider {
   display: none;
 }
+
+.videoSelected {
+  background-color: dodgerblue !important;
+  color: white !important;
+}

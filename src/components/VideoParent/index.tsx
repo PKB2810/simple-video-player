@@ -99,11 +99,22 @@ class VideoParent extends React.Component<any, State> {
   };
 
   playVideo = (videoUrl: string): void => {
-    this.setState({
-      currentVideo: this.state.videoList.filter(
-        video => video.source === videoUrl
-      )[0]
-    });
+    this.setState(
+      {
+        currentVideo: this.state.videoList.filter(
+          video => video.source === videoUrl
+        )[0]
+      },
+      () => {
+        this.setState(prevState => ({
+          currentVideo: {
+            // object that we want to update
+            ...prevState.currentVideo, // keep all other key-value pairs
+            status: true // update the value of specific key
+          }
+        }));
+      }
+    );
   };
 
   playPreviousVideo = (): void => {
@@ -144,6 +155,7 @@ class VideoParent extends React.Component<any, State> {
         <VideoList
           videoList={this.state.videoList}
           playVideo={this.playVideo}
+          currentVideo={this.state.currentVideo}
         />
         <VideoPlayer
           currentVideo={this.state.currentVideo}
