@@ -5,6 +5,7 @@ import Video from '../Video';
 import VideoSeekControl from '../VideoSeekControl';
 import VideoButton from '../VideoButton';
 import Heading from '../../Heading';
+import VideoFullScreen from '../VideoFullScreen';
 
 interface Props {
   currentVideo: IVideoObject;
@@ -20,6 +21,7 @@ interface State {
   autoPlay: boolean;
   videoEnded: boolean;
   showControls: boolean;
+  fullScreen: boolean;
   mouseX: any;
   mouseY: any;
 }
@@ -43,6 +45,7 @@ class VideoPlayer extends React.Component<Props, State> {
     autoPlay: false,
     videoEnded: false,
     showControls: false,
+    fullScreen: false,
     mouseX: 0,
     mouseY: 0
   };
@@ -142,7 +145,9 @@ class VideoPlayer extends React.Component<Props, State> {
   };
 
   goFullScreen = () => {
-    this.video.current.webkitEnterFullscreen();
+    this.setState({
+      fullScreen: !this.state.fullScreen
+    });
   };
 
   setShowControls = (e: any) => {
@@ -173,20 +178,43 @@ class VideoPlayer extends React.Component<Props, State> {
             <Heading textSize="lg">{this.props.currentVideo.title}</Heading>
             <Heading textSize="md">{this.props.currentVideo.subtitle}</Heading>
             <section style={{ width: '100%' }} onClick={this.setShowControls}>
-              <Video
-                videoSrc={this.props.currentVideo.source}
-                videoRef={this.video}
-                setVideoDuration={this.setVideoDuration}
-                setVolume={this.setVolume}
-                setCurrentTime={this.setCurrentTime}
-              />
-              <VideoDescription>
-                Description:{this.props.currentVideo.description}
-              </VideoDescription>
+              {this.state.fullScreen ? (
+                <VideoFullScreen
+                  currentVideo={this.props.currentVideo}
+                  showFlag={this.state.fullScreen}
+                  goFullScreen={this.goFullScreen}>
+                  <Video
+                    videoSrc={this.props.currentVideo.source}
+                    videoRef={this.video}
+                    setVideoDuration={this.setVideoDuration}
+                    setVolume={this.setVolume}
+                    setCurrentTime={this.setCurrentTime}
+                  />
+                </VideoFullScreen>
+              ) : (
+                <>
+                  {' '}
+                  <Video
+                    videoSrc={this.props.currentVideo.source}
+                    videoRef={this.video}
+                    setVideoDuration={this.setVideoDuration}
+                    setVolume={this.setVolume}
+                    setCurrentTime={this.setCurrentTime}
+                  />
+                  <VideoDescription>
+                    Description:{this.props.currentVideo.description}
+                  </VideoDescription>
+                </>
+              )}
             </section>
             {this.state.showControls && (
               <section
-                style={{ position: 'absolute', top: '50%', left: '50%' }}>
+                style={{
+                  zIndex: 2,
+                  position: 'absolute',
+                  top: '50%',
+                  left: '50%'
+                }}>
                 <section>
                   <VideoButton onClickHandler={this.props.playPreviousVideo}>
                     Play Previous
