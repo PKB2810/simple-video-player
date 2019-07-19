@@ -290,7 +290,7 @@ class VideoPlayer extends React.Component<Props, State> {
                 </section>
                 <section>
                   <VideoButton onClickHandler={this.goFullScreen}>
-                    Fullscreen
+                    {this.state.fullScreen ? 'Exit fullscreen' : 'FullScreen'}
                   </VideoButton>
                 </section>
               </section>
