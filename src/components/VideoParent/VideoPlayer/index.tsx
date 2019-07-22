@@ -8,7 +8,7 @@ import Heading from "../../Heading";
 import VideoFullScreen from "../VideoFullScreen";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faVolumeOff,
+  faVolumeMute,
   faPlay,
   faPause,
   faForward,
@@ -66,6 +66,8 @@ class VideoPlayer extends React.Component<Props, State> {
     else {
       this.video.current.minutes = 0;
       this.video.current.seconds = 0;
+      this.video.current.totalMinutes = 0;
+      this.video.current.totalSeconds = 0;
       if (this.props.currentVideo.status) {
         this.video.current.play();
       } else {
@@ -87,6 +89,13 @@ class VideoPlayer extends React.Component<Props, State> {
   setVideoDuration = () => {
     //duration of video is set when browser is ready to play the video,onCanPlay event
     this.props.setDuration(this.video.current.duration);
+    this.video.current.totalMinutes = Math.floor(
+      parseFloat(this.video.current.duration) / 60
+    );
+    this.video.current.totalSeconds = (
+      parseFloat(this.video.current.duration) -
+      this.video.current.totalMinutes * 60
+    ).toFixed(0);
   };
   setCurrentTime = (e: any) => {
     // change currentTime of video when slider changes or onTimeUpdate event of video
@@ -179,6 +188,208 @@ class VideoPlayer extends React.Component<Props, State> {
       }
     }, 50000000);
   };
+
+  renderControls = () => {
+    return (
+      <>
+        <span
+          style={{
+            color: "white",
+            position: "absolute",
+            marginLeft: "2px",
+            top: "30%",
+            left: "10%",
+            fontSize: "50px"
+          }}
+          onClick={this.props.playPreviousVideo}
+        >
+          <FontAwesomeIcon icon={faCaretLeft} />
+        </span>
+        <span
+          style={{
+            color: "white",
+            position: "absolute",
+            marginLeft: "2px",
+            top: "30%",
+            left: "50%",
+            fontSize: "50px"
+          }}
+          onClick={this.props.toggleStatus}
+        >
+          <FontAwesomeIcon
+            icon={this.props.currentVideo.status ? faPause : faPlay}
+          />
+        </span>
+        <span
+          style={{
+            color: "white",
+            position: "absolute",
+            marginLeft: "2px",
+            top: "30%",
+            left: "90%",
+            fontSize: "50px"
+          }}
+          onClick={this.props.playNextVideo}
+        >
+          <FontAwesomeIcon icon={faCaretRight} />
+        </span>
+
+        <section
+          style={{
+            zIndex: 2,
+            position: "relative",
+            display: "flex",
+            justifyContent: "space-around",
+            flexDirection: "row",
+            flexWrap: "wrap",
+            width: "100%",
+
+            overflow: "auto"
+          }}
+          onClick={(e: any) => e.stopPropagation()}
+        >
+          <span
+            style={{
+              color: "white",
+              display: "flex",
+              marginLeft: "2px"
+            }}
+            onClick={this.props.toggleStatus}
+          >
+            <FontAwesomeIcon
+              style={{ marginTop: "5px" }}
+              icon={this.props.currentVideo.status ? faPause : faPlay}
+            />
+          </span>
+
+          <VideoSeekControl
+            labelText={
+              this.video.current.minutes + ":" + this.video.current.seconds
+            }
+            rangeRef={this.slider}
+            minVal="0"
+            maxVal={this.props.currentVideo.duration.toString()}
+            currentVal={this.props.currentVideo.currentTime.toString()}
+            stepVal="1"
+            labelMaxVal={
+              this.video.current.totalMinutes.toString() +
+              ":" +
+              this.video.current.totalSeconds
+            }
+            onChangeHandler={this.setCurrentTime}
+            render={props => (
+              <>
+                <span
+                  style={{
+                    color: "white",
+                    display: "flex",
+                    marginLeft: "2px"
+                  }}
+                >
+                  {props.labelText}
+                  <input
+                    style={{
+                      backgroundColor: "transparent",
+                      marginLeft: "2px",
+                      marginRight: "2px"
+                    }}
+                    type="range"
+                    ref={props.rangeRef}
+                    min={props.minVal}
+                    max={props.maxVal}
+                    value={props.currentVal}
+                    step={props.stepVal}
+                    onChange={e => props.onChangeHandler(e)}
+                  />
+                  <span>{props.labelMaxVal}</span>
+                </span>
+              </>
+            )}
+          />
+          <VideoSeekControl
+            labelText={
+              <FontAwesomeIcon
+                style={{ marginTop: "5px" }}
+                icon={faVolumeMute}
+              />
+            }
+            rangeRef={this.volumeSlider}
+            minVal="0.0"
+            maxVal="1.0"
+            currentVal={this.state.volume}
+            stepVal="0.1"
+            labelMaxVal="100%"
+            onChangeHandler={this.setVolume}
+            render={props => (
+              <>
+                <span
+                  style={{
+                    color: "white",
+                    display: "flex",
+                    marginLeft: "2px"
+                  }}
+                >
+                  {props.labelText}
+                  <input
+                    style={{
+                      backgroundColor: "transparent",
+                      marginLeft: "2px",
+                      marginRight: "2px"
+                    }}
+                    type="range"
+                    ref={props.rangeRef}
+                    min={props.minVal}
+                    max={props.maxVal}
+                    value={props.currentVal}
+                    step={props.stepVal}
+                    onChange={e => props.onChangeHandler(e)}
+                  />
+                  <span>{props.labelMaxVal}</span>
+                </span>
+              </>
+            )}
+          />
+          <span
+            style={{
+              color: "white",
+              display: "flex",
+              marginLeft: "2px"
+            }}
+            onClick={this.skipBackBy30Sec}
+          >
+            <FontAwesomeIcon style={{ marginTop: "5px" }} icon={faBackward} />
+            30
+          </span>
+          <span
+            style={{
+              color: "white",
+              display: "flex",
+              marginLeft: "2px"
+            }}
+            onClick={this.skipForwardBy30Sec}
+          >
+            30
+            <FontAwesomeIcon style={{ marginTop: "5px" }} icon={faForward} />
+          </span>
+          <span
+            style={{
+              color: "white",
+              display: "flex",
+              marginLeft: "2px"
+            }}
+            onClick={this.goFullScreen}
+          >
+            {this.state.fullScreen ? (
+              <FontAwesomeIcon style={{ marginTop: "5px" }} icon={faCompress} />
+            ) : (
+              <FontAwesomeIcon style={{ marginTop: "5px" }} icon={faExpand} />
+            )}
+          </span>
+        </section>
+      </>
+    );
+  };
+
   render() {
     if (this.props.currentVideo.source.trim() !== "") {
       return (
@@ -210,126 +421,18 @@ class VideoPlayer extends React.Component<Props, State> {
                     setVolume={this.setVolume}
                     setCurrentTime={this.setCurrentTime}
                   />
-                  {this.state.showControls && (
-                    <section
-                      style={{
-                        zIndex: 2,
-                        position: "relative",
-                        display: "flex",
-                        justifyContent: "space-around",
-                        flex: 1,
-                        flexDirection: "row",
-                        flexWrap: "wrap"
-                      }}
-                      onClick={(e: any) => e.stopPropagation()}
-                    >
-                      <span
-                        style={{ color: "white" }}
-                        onClick={this.props.playPreviousVideo}
-                      >
-                        <FontAwesomeIcon icon={faCaretLeft} />
-                      </span>
-                      <span
-                        style={{ color: "white" }}
-                        onClick={this.props.toggleStatus}
-                      >
-                        <FontAwesomeIcon
-                          icon={
-                            this.props.currentVideo.status ? faPause : faPlay
-                          }
-                        />
-                      </span>
-                      <span
-                        style={{ color: "white" }}
-                        onClick={this.props.playNextVideo}
-                      >
-                        <FontAwesomeIcon icon={faCaretRight} />
-                      </span>
-                      <VideoSeekControl
-                        labelText={
-                          this.video.current.minutes +
-                          ":" +
-                          this.video.current.seconds
-                        }
-                        rangeRef={this.slider}
-                        minVal="0"
-                        maxVal={this.props.currentVideo.duration.toString()}
-                        currentVal={this.props.currentVideo.currentTime.toString()}
-                        stepVal="1"
-                        onChangeHandler={this.setCurrentTime}
-                        render={props => (
-                          <>
-                            <span style={{ color: "white" }}>
-                              {props.labelText}
-                              <input
-                                type="range"
-                                ref={props.rangeRef}
-                                min={props.minVal}
-                                max={props.maxVal}
-                                value={props.currentVal}
-                                step={props.stepVal}
-                                onChange={e => props.onChangeHandler(e)}
-                              />
-                            </span>
-                          </>
-                        )}
-                      />
-                      <VideoSeekControl
-                        labelText={<FontAwesomeIcon icon={faVolumeOff} />}
-                        rangeRef={this.volumeSlider}
-                        minVal="0.0"
-                        maxVal="1.0"
-                        currentVal={this.state.volume}
-                        stepVal="0.1"
-                        onChangeHandler={this.setVolume}
-                        render={props => (
-                          <>
-                            <span style={{ color: "white" }}>
-                              {props.labelText}
-                              <input
-                                type="range"
-                                ref={props.rangeRef}
-                                min={props.minVal}
-                                max={props.maxVal}
-                                value={props.currentVal}
-                                step={props.stepVal}
-                                onChange={e => props.onChangeHandler(e)}
-                              />
-                            </span>
-                          </>
-                        )}
-                      />
-                      <span
-                        style={{ color: "white" }}
-                        onClick={this.skipBackBy30Sec}
-                      >
-                        <FontAwesomeIcon icon={faBackward} />
-                        30
-                      </span>
-                      <span
-                        style={{ color: "white" }}
-                        onClick={this.skipForwardBy30Sec}
-                      >
-                        30
-                        <FontAwesomeIcon icon={faForward} />
-                      </span>
-                      <span
-                        style={{ color: "white" }}
-                        onClick={this.goFullScreen}
-                      >
-                        {this.state.fullScreen ? (
-                          <FontAwesomeIcon icon={faCompress} />
-                        ) : (
-                          <FontAwesomeIcon icon={faExpand} />
-                        )}
-                      </span>
-                    </section>
-                  )}
+                  {this.state.showControls && this.renderControls()}
                 </VideoFullScreen>
               ) : (
                 <>
                   {" "}
-                  <section style={{ backgroundColor: "black" }}>
+                  <section
+                    style={{
+                      backgroundColor: "black",
+                      width: "100%",
+                      position: "relative"
+                    }}
+                  >
                     <Video
                       videoSrc={this.props.currentVideo.source}
                       videoRef={this.video}
@@ -337,120 +440,7 @@ class VideoPlayer extends React.Component<Props, State> {
                       setVolume={this.setVolume}
                       setCurrentTime={this.setCurrentTime}
                     />
-                    {this.state.showControls && (
-                      <section
-                        style={{
-                          zIndex: 2,
-                          position: "relative",
-                          display: "flex",
-                          justifyContent: "space-between",
-                          width: "100%",
-                          height: "20%"
-                        }}
-                        onClick={(e: any) => e.stopPropagation()}
-                      >
-                        <span
-                          style={{ color: "white" }}
-                          onClick={this.props.playPreviousVideo}
-                        >
-                          <FontAwesomeIcon icon={faCaretLeft} />
-                        </span>
-                        <span
-                          style={{ color: "white" }}
-                          onClick={this.props.toggleStatus}
-                        >
-                          <FontAwesomeIcon
-                            icon={
-                              this.props.currentVideo.status ? faPause : faPlay
-                            }
-                          />
-                        </span>
-                        <span
-                          style={{ color: "white" }}
-                          onClick={this.props.playNextVideo}
-                        >
-                          <FontAwesomeIcon icon={faCaretRight} />
-                        </span>
-                        <VideoSeekControl
-                          labelText={
-                            this.video.current.minutes +
-                            ":" +
-                            this.video.current.seconds
-                          }
-                          rangeRef={this.slider}
-                          minVal="0"
-                          maxVal={this.props.currentVideo.duration.toString()}
-                          currentVal={this.props.currentVideo.currentTime.toString()}
-                          stepVal="1"
-                          onChangeHandler={this.setCurrentTime}
-                          render={props => (
-                            <>
-                              <span style={{ color: "white" }}>
-                                {props.labelText}
-                                <input
-                                  type="range"
-                                  ref={props.rangeRef}
-                                  min={props.minVal}
-                                  max={props.maxVal}
-                                  value={props.currentVal}
-                                  step={props.stepVal}
-                                  onChange={e => props.onChangeHandler(e)}
-                                />
-                              </span>
-                            </>
-                          )}
-                        />
-                        <VideoSeekControl
-                          labelText={<FontAwesomeIcon icon={faVolumeOff} />}
-                          rangeRef={this.volumeSlider}
-                          minVal="0.0"
-                          maxVal="1.0"
-                          currentVal={this.state.volume}
-                          stepVal="0.1"
-                          onChangeHandler={this.setVolume}
-                          render={props => (
-                            <>
-                              <span style={{ color: "white" }}>
-                                {props.labelText}
-                                <input
-                                  type="range"
-                                  ref={props.rangeRef}
-                                  min={props.minVal}
-                                  max={props.maxVal}
-                                  value={props.currentVal}
-                                  step={props.stepVal}
-                                  onChange={e => props.onChangeHandler(e)}
-                                />
-                              </span>
-                            </>
-                          )}
-                        />
-                        <span
-                          style={{ color: "white" }}
-                          onClick={this.skipBackBy30Sec}
-                        >
-                          <FontAwesomeIcon icon={faBackward} />
-                          30
-                        </span>
-                        <span
-                          style={{ color: "white" }}
-                          onClick={this.skipForwardBy30Sec}
-                        >
-                          30
-                          <FontAwesomeIcon icon={faForward} />
-                        </span>
-                        <span
-                          style={{ color: "white" }}
-                          onClick={this.goFullScreen}
-                        >
-                          {this.state.fullScreen ? (
-                            <FontAwesomeIcon icon={faCompress} />
-                          ) : (
-                            <FontAwesomeIcon icon={faExpand} />
-                          )}
-                        </span>
-                      </section>
-                    )}
+                    {this.state.showControls && this.renderControls()}
                   </section>
                   <VideoDescription>
                     Description:{this.props.currentVideo.description}

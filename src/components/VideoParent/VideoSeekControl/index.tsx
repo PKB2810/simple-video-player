@@ -7,6 +7,7 @@ interface Props {
   currentVal: any;
   stepVal: any;
   rangeRef: any;
+  labelMaxVal: any;
   onChangeHandler: (e: any) => void;
   render: (props: any) => any;
 }
