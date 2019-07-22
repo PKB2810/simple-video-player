@@ -34,8 +34,6 @@ interface State {
   videoEnded: boolean;
   showControls: boolean;
   fullScreen: boolean;
-  mouseX: any;
-  mouseY: any;
 }
 
 class VideoPlayer extends React.Component<Props, State> {
@@ -57,9 +55,7 @@ class VideoPlayer extends React.Component<Props, State> {
     autoPlay: false,
     videoEnded: false,
     showControls: false,
-    fullScreen: false,
-    mouseX: 0,
-    mouseY: 0
+    fullScreen: false
   };
   componentDidMount() {
     if (!this.video.current) return;
@@ -89,26 +85,26 @@ class VideoPlayer extends React.Component<Props, State> {
   setVideoDuration = () => {
     //duration of video is set when browser is ready to play the video,onCanPlay event
     this.props.setDuration(this.video.current.duration);
-    this.video.current.totalMinutes = Math.floor(
-      parseFloat(this.video.current.duration) / 60
+    this.video.current.totalMinutes = this.getMinutes(
+      this.video.current.duration
     );
-    this.video.current.totalSeconds = (
-      parseFloat(this.video.current.duration) -
-      this.video.current.totalMinutes * 60
-    ).toFixed(0);
+    this.video.current.totalSeconds = this.getSeconds(
+      this.video.current.duration,
+      this.video.current.totalMinutes
+    );
   };
   setCurrentTime = (e: any) => {
     // change currentTime of video when slider changes or onTimeUpdate event of video
     if (e.target.type === "range") {
       this.props.changeCurrentTime(this.slider.current.value); //set current time to slider value so as it reflects in slider
       this.video.current.currentTime = this.slider.current.value; //play video from current time set
-      this.video.current.minutes = Math.floor(
-        parseFloat(this.video.current.currentTime) / 60
+      this.video.current.minutes = this.getMinutes(
+        this.video.current.currentTime
       );
-      this.video.current.seconds = (
-        parseFloat(this.video.current.currentTime) -
-        this.video.current.minutes * 60
-      ).toFixed(0);
+      this.video.current.seconds = this.getSeconds(
+        this.video.current.currentTime,
+        this.video.current.minutes
+      );
     } else {
       if (!this.slider.current) return;
       if (
@@ -120,18 +116,24 @@ class VideoPlayer extends React.Component<Props, State> {
         this.props.toggleStatus();
       } else {
         this.props.changeCurrentTime(this.video.current.currentTime); //update current time so as to reflect in slider
-        this.video.current.minutes = Math.floor(
-          parseFloat(this.video.current.currentTime) / 60
+        this.video.current.minutes = this.getMinutes(
+          this.video.current.currentTime
         );
-        this.video.current.seconds = (
-          parseFloat(this.video.current.currentTime) -
-          this.video.current.minutes * 60
-        ).toFixed(0);
+        this.video.current.seconds = this.getSeconds(
+          this.video.current.currentTime,
+          this.video.current.minutes
+        );
       }
     }
   };
-
+  getMinutes: any = (time: any) => {
+    return Math.floor(parseFloat(time) / 60);
+  };
+  getSeconds: any = (time: any, minutes: any) => {
+    return (parseFloat(time) - minutes * 60).toFixed(0);
+  };
   setVolume = (e: any) => {
+    const { volume } = this.state;
     if (e.target.type === "range") {
       this.setState(
         { volume: parseFloat(this.volumeSlider.current.value) },
@@ -142,7 +144,7 @@ class VideoPlayer extends React.Component<Props, State> {
         }
       );
     } else {
-      this.video.current.volume = this.state.volume;
+      this.video.current.volume = volume;
     }
   };
   skipForwardBy30Sec = () => {
@@ -166,30 +168,43 @@ class VideoPlayer extends React.Component<Props, State> {
   };
 
   goFullScreen = () => {
+    const { fullScreen } = this.state;
     this.setState({
-      fullScreen: !this.state.fullScreen
+      fullScreen: !fullScreen
     });
   };
 
   setShowControls = (e: Event) => {
-    //  e.stopPropagation();
-    this.setState({
-      showControls: !this.state.showControls
-    });
-    if (this.showControlTimeout) {
-      clearTimeout(this.showControlTimeout);
-    }
-    this.showControlTimeout = setTimeout(() => {
-      //to hide controls after 5 sec
-      if (this.state.showControls) {
-        this.setState({
-          showControls: !this.state.showControls
-        });
+    const { showControls } = this.state;
+    e.stopPropagation();
+    this.setState(
+      {
+        showControls: !showControls
+      },
+      () => {
+        if (this.showControlTimeout) {
+          clearTimeout(this.showControlTimeout);
+        }
+        this.showControlTimeout = setTimeout(() => {
+          //to hide controls after 5 sec
+          if (showControls) {
+            this.setState({
+              showControls: !showControls
+            });
+          }
+        }, 5000);
       }
-    }, 50000000);
+    );
   };
 
   renderControls = () => {
+    const {
+      toggleStatus,
+      playPreviousVideo,
+      playNextVideo,
+      currentVideo
+    } = this.props;
+    const { fullScreen, volume } = this.state;
     return (
       <>
         <span
@@ -201,7 +216,10 @@ class VideoPlayer extends React.Component<Props, State> {
             left: "10%",
             fontSize: "50px"
           }}
-          onClick={this.props.playPreviousVideo}
+          onClick={(e: any) => {
+            e.stopPropagation();
+            playPreviousVideo();
+          }}
         >
           <FontAwesomeIcon icon={faCaretLeft} />
         </span>
@@ -214,11 +232,12 @@ class VideoPlayer extends React.Component<Props, State> {
             left: "50%",
             fontSize: "50px"
           }}
-          onClick={this.props.toggleStatus}
+          onClick={(e: any) => {
+            e.stopPropagation();
+            toggleStatus();
+          }}
         >
-          <FontAwesomeIcon
-            icon={this.props.currentVideo.status ? faPause : faPlay}
-          />
+          <FontAwesomeIcon icon={currentVideo.status ? faPause : faPlay} />
         </span>
         <span
           style={{
@@ -229,7 +248,10 @@ class VideoPlayer extends React.Component<Props, State> {
             left: "90%",
             fontSize: "50px"
           }}
-          onClick={this.props.playNextVideo}
+          onClick={(e: any) => {
+            e.stopPropagation();
+            playNextVideo();
+          }}
         >
           <FontAwesomeIcon icon={faCaretRight} />
         </span>
@@ -253,11 +275,11 @@ class VideoPlayer extends React.Component<Props, State> {
               display: "flex",
               marginLeft: "2px"
             }}
-            onClick={this.props.toggleStatus}
+            onClick={toggleStatus}
           >
             <FontAwesomeIcon
               style={{ marginTop: "5px" }}
-              icon={this.props.currentVideo.status ? faPause : faPlay}
+              icon={currentVideo.status ? faPause : faPlay}
             />
           </span>
 
@@ -315,7 +337,7 @@ class VideoPlayer extends React.Component<Props, State> {
             rangeRef={this.volumeSlider}
             minVal="0.0"
             maxVal="1.0"
-            currentVal={this.state.volume}
+            currentVal={volume}
             stepVal="0.1"
             labelMaxVal="100%"
             onChangeHandler={this.setVolume}
@@ -378,7 +400,7 @@ class VideoPlayer extends React.Component<Props, State> {
             }}
             onClick={this.goFullScreen}
           >
-            {this.state.fullScreen ? (
+            {fullScreen ? (
               <FontAwesomeIcon style={{ marginTop: "5px" }} icon={faCompress} />
             ) : (
               <FontAwesomeIcon style={{ marginTop: "5px" }} icon={faExpand} />
@@ -390,79 +412,61 @@ class VideoPlayer extends React.Component<Props, State> {
   };
 
   render() {
+    const { currentVideo } = this.props;
+    const { showControls, fullScreen } = this.state;
     if (this.props.currentVideo.source.trim() !== "") {
       return (
-        <section
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            width: "70%",
-            height: "100%"
-          }}
-        >
-          <section style={{ width: "100%" }}>
-            <Heading textSize="lg">{this.props.currentVideo.title}</Heading>
-            <Heading textSize="md">{this.props.currentVideo.subtitle}</Heading>
-            <section
-              style={{ width: "100%" }}
-              onClick={(e: any) => this.setShowControls(e)}
-            >
-              {this.state.fullScreen ? (
-                <VideoFullScreen
-                  currentVideo={this.props.currentVideo}
-                  showFlag={this.state.fullScreen}
-                  goFullScreen={this.goFullScreen}
+        <section style={{ width: "100%" }}>
+          <Heading textSize="lg">{currentVideo.title}</Heading>
+          <Heading textSize="md">{currentVideo.subtitle}</Heading>
+          <section
+            style={{ width: "100%" }}
+            onClick={(e: any) => this.setShowControls(e)}
+          >
+            {fullScreen ? (
+              <VideoFullScreen
+                currentVideo={currentVideo}
+                showFlag={fullScreen}
+                goFullScreen={this.goFullScreen}
+              >
+                <Video
+                  videoSrc={currentVideo.source}
+                  videoRef={this.video}
+                  setVideoDuration={this.setVideoDuration}
+                  setVolume={this.setVolume}
+                  setCurrentTime={this.setCurrentTime}
+                />
+                {showControls && this.renderControls()}
+              </VideoFullScreen>
+            ) : (
+              <>
+                {" "}
+                <section
+                  style={{
+                    backgroundColor: "black",
+                    width: "100%",
+                    position: "relative"
+                  }}
                 >
                   <Video
-                    videoSrc={this.props.currentVideo.source}
+                    videoSrc={currentVideo.source}
                     videoRef={this.video}
                     setVideoDuration={this.setVideoDuration}
                     setVolume={this.setVolume}
                     setCurrentTime={this.setCurrentTime}
                   />
-                  {this.state.showControls && this.renderControls()}
-                </VideoFullScreen>
-              ) : (
-                <>
-                  {" "}
-                  <section
-                    style={{
-                      backgroundColor: "black",
-                      width: "100%",
-                      position: "relative"
-                    }}
-                  >
-                    <Video
-                      videoSrc={this.props.currentVideo.source}
-                      videoRef={this.video}
-                      setVideoDuration={this.setVideoDuration}
-                      setVolume={this.setVolume}
-                      setCurrentTime={this.setCurrentTime}
-                    />
-                    {this.state.showControls && this.renderControls()}
-                  </section>
-                  <VideoDescription>
-                    Description:{this.props.currentVideo.description}
-                  </VideoDescription>
-                </>
-              )}
-            </section>
+                  {showControls && this.renderControls()}
+                </section>
+                <VideoDescription>
+                  Description:{currentVideo.description}
+                </VideoDescription>
+              </>
+            )}
           </section>
         </section>
       );
     }
-    return (
-      <section
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          width: "70%",
-          height: "100%"
-        }}
-      >
-        Click on any video
-      </section>
-    );
+    return "Click on any video";
   }
 }
 export default VideoPlayer;

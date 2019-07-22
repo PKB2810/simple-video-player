@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 interface Props {
   children: any;
@@ -6,8 +6,8 @@ interface Props {
 }
 class Heading extends React.Component<Props, any> {
   render() {
-    if (this.props.textSize === 'lg') return <h1>{this.props.children}</h1>;
-    else return <h3>{this.props.children}</h3>;
+    if (this.props.textSize === "lg") return <h1>{this.props.children}</h1>;
+    return <h3>{this.props.children}</h3>;
   }
 }
 
