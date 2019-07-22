@@ -243,7 +243,6 @@ class VideoPlayer extends React.Component<Props, State> {
             flexDirection: "row",
             flexWrap: "wrap",
             width: "100%",
-
             overflow: "auto"
           }}
           onClick={(e: any) => e.stopPropagation()}
