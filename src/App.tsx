@@ -1,8 +1,7 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
-import Header from './components/Header';
-import VideoParent from './components/VideoParent';
+import React from "react";
+import "./App.css";
+import Header from "./components/Header";
+import VideoParent from "./components/VideoParent";
 
 const App: React.FC = () => {
   return (
@@ -10,11 +9,12 @@ const App: React.FC = () => {
       <Header>Video Player</Header>
       <section
         style={{
-          display: 'flex',
-          justifyContent: 'space-around',
-          width: '100%',
-          height: '100%'
-        }}>
+          display: "flex",
+          justifyContent: "space-around",
+          width: "100%",
+          height: "100%"
+        }}
+      >
         <VideoParent />
       </section>
     </div>

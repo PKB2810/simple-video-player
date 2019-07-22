@@ -3,7 +3,6 @@ import { IVideoObject } from "../../VideoParent";
 import VideoDescription from "../VideoDescription";
 import Video from "../Video";
 import VideoSeekControl from "../VideoSeekControl";
-import VideoButton from "../VideoButton";
 import Heading from "../../Heading";
 import VideoFullScreen from "../VideoFullScreen";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
