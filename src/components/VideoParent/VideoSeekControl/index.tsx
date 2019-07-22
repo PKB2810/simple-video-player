@@ -1,7 +1,7 @@
-import React from 'react';
+import React from "react";
 
 interface Props {
-  labelText: string;
+  labelText: any;
   minVal: any;
   maxVal: any;
   currentVal: any;

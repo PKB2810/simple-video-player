@@ -8,8 +8,7 @@ import Heading from "../../Heading";
 import VideoFullScreen from "../VideoFullScreen";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faVolumeDown,
-  faVolumeUp,
+  faVolumeOff,
   faPlay,
   faPause,
   faForward,
@@ -163,7 +162,8 @@ class VideoPlayer extends React.Component<Props, State> {
     });
   };
 
-  setShowControls = (e: any) => {
+  setShowControls = (e: Event) => {
+    //  e.stopPropagation();
     this.setState({
       showControls: !this.state.showControls
     });
@@ -177,7 +177,7 @@ class VideoPlayer extends React.Component<Props, State> {
           showControls: !this.state.showControls
         });
       }
-    }, 5000);
+    }, 50000000);
   };
   render() {
     if (this.props.currentVideo.source.trim() !== "") {
@@ -193,7 +193,10 @@ class VideoPlayer extends React.Component<Props, State> {
           <section style={{ width: "100%" }}>
             <Heading textSize="lg">{this.props.currentVideo.title}</Heading>
             <Heading textSize="md">{this.props.currentVideo.subtitle}</Heading>
-            <section style={{ width: "100%" }} onClick={this.setShowControls}>
+            <section
+              style={{ width: "100%" }}
+              onClick={(e: any) => this.setShowControls(e)}
+            >
               {this.state.fullScreen ? (
                 <VideoFullScreen
                   currentVideo={this.props.currentVideo}
@@ -214,9 +217,11 @@ class VideoPlayer extends React.Component<Props, State> {
                         position: "relative",
                         display: "flex",
                         justifyContent: "space-around",
+                        flex: 1,
                         flexDirection: "row",
                         flexWrap: "wrap"
                       }}
+                      onClick={(e: any) => e.stopPropagation()}
                     >
                       <span
                         style={{ color: "white" }}
@@ -256,21 +261,21 @@ class VideoPlayer extends React.Component<Props, State> {
                           <>
                             <span style={{ color: "white" }}>
                               {props.labelText}
+                              <input
+                                type="range"
+                                ref={props.rangeRef}
+                                min={props.minVal}
+                                max={props.maxVal}
+                                value={props.currentVal}
+                                step={props.stepVal}
+                                onChange={e => props.onChangeHandler(e)}
+                              />
                             </span>
-                            <input
-                              type="range"
-                              ref={props.rangeRef}
-                              min={props.minVal}
-                              max={props.maxVal}
-                              value={props.currentVal}
-                              step={props.stepVal}
-                              onChange={e => props.onChangeHandler(e)}
-                            />
                           </>
                         )}
                       />
                       <VideoSeekControl
-                        labelText={"Volume:"}
+                        labelText={<FontAwesomeIcon icon={faVolumeOff} />}
                         rangeRef={this.volumeSlider}
                         minVal="0.0"
                         maxVal="1.0"
@@ -281,16 +286,16 @@ class VideoPlayer extends React.Component<Props, State> {
                           <>
                             <span style={{ color: "white" }}>
                               {props.labelText}
+                              <input
+                                type="range"
+                                ref={props.rangeRef}
+                                min={props.minVal}
+                                max={props.maxVal}
+                                value={props.currentVal}
+                                step={props.stepVal}
+                                onChange={e => props.onChangeHandler(e)}
+                              />
                             </span>
-                            <input
-                              type="range"
-                              ref={props.rangeRef}
-                              min={props.minVal}
-                              max={props.maxVal}
-                              value={props.currentVal}
-                              step={props.stepVal}
-                              onChange={e => props.onChangeHandler(e)}
-                            />
                           </>
                         )}
                       />
@@ -313,9 +318,9 @@ class VideoPlayer extends React.Component<Props, State> {
                         onClick={this.goFullScreen}
                       >
                         {this.state.fullScreen ? (
-                          <FontAwesomeIcon icon={faExpand} />
-                        ) : (
                           <FontAwesomeIcon icon={faCompress} />
+                        ) : (
+                          <FontAwesomeIcon icon={faExpand} />
                         )}
                       </span>
                     </section>
@@ -338,8 +343,11 @@ class VideoPlayer extends React.Component<Props, State> {
                           zIndex: 2,
                           position: "relative",
                           display: "flex",
-                          justifyContent: "space-around"
+                          justifyContent: "space-between",
+                          width: "100%",
+                          height: "20%"
                         }}
+                        onClick={(e: any) => e.stopPropagation()}
                       >
                         <span
                           style={{ color: "white" }}
@@ -379,21 +387,21 @@ class VideoPlayer extends React.Component<Props, State> {
                             <>
                               <span style={{ color: "white" }}>
                                 {props.labelText}
+                                <input
+                                  type="range"
+                                  ref={props.rangeRef}
+                                  min={props.minVal}
+                                  max={props.maxVal}
+                                  value={props.currentVal}
+                                  step={props.stepVal}
+                                  onChange={e => props.onChangeHandler(e)}
+                                />
                               </span>
-                              <input
-                                type="range"
-                                ref={props.rangeRef}
-                                min={props.minVal}
-                                max={props.maxVal}
-                                value={props.currentVal}
-                                step={props.stepVal}
-                                onChange={e => props.onChangeHandler(e)}
-                              />
                             </>
                           )}
                         />
                         <VideoSeekControl
-                          labelText={"Volume:"}
+                          labelText={<FontAwesomeIcon icon={faVolumeOff} />}
                           rangeRef={this.volumeSlider}
                           minVal="0.0"
                           maxVal="1.0"
@@ -404,16 +412,16 @@ class VideoPlayer extends React.Component<Props, State> {
                             <>
                               <span style={{ color: "white" }}>
                                 {props.labelText}
+                                <input
+                                  type="range"
+                                  ref={props.rangeRef}
+                                  min={props.minVal}
+                                  max={props.maxVal}
+                                  value={props.currentVal}
+                                  step={props.stepVal}
+                                  onChange={e => props.onChangeHandler(e)}
+                                />
                               </span>
-                              <input
-                                type="range"
-                                ref={props.rangeRef}
-                                min={props.minVal}
-                                max={props.maxVal}
-                                value={props.currentVal}
-                                step={props.stepVal}
-                                onChange={e => props.onChangeHandler(e)}
-                              />
                             </>
                           )}
                         />
@@ -436,9 +444,9 @@ class VideoPlayer extends React.Component<Props, State> {
                           onClick={this.goFullScreen}
                         >
                           {this.state.fullScreen ? (
-                            <FontAwesomeIcon icon={faExpand} />
-                          ) : (
                             <FontAwesomeIcon icon={faCompress} />
+                          ) : (
+                            <FontAwesomeIcon icon={faExpand} />
                           )}
                         </span>
                       </section>
