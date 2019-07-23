@@ -174,11 +174,10 @@ class VideoPlayer extends React.Component<Props, State> {
   };
 
   setShowControls = (e: Event) => {
-    const { showControls } = this.state;
     e.stopPropagation();
     this.setState(
       {
-        showControls: !showControls
+        showControls: !this.state.showControls
       },
       () => {
         if (this.showControlTimeout) {
@@ -186,9 +185,9 @@ class VideoPlayer extends React.Component<Props, State> {
         }
         this.showControlTimeout = setTimeout(() => {
           //to hide controls after 5 sec
-          if (showControls) {
+          if (this.state.showControls) {
             this.setState({
-              showControls: !showControls
+              showControls: !this.state.showControls
             });
           }
         }, 5000);
