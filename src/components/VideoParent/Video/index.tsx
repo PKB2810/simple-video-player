@@ -9,17 +9,24 @@ interface Props {
 }
 class Video extends React.Component<any, any> {
   render() {
+    const {
+      setVideoDuration,
+      setVolume,
+      setCurrentTime,
+      videoSrc,
+      videoRef
+    } = this.props;
     return (
       <video
         width="100%"
         height="80%"
-        src={this.props.videoSrc}
-        ref={this.props.videoRef}
+        src={videoSrc}
+        ref={videoRef}
         onCanPlay={e => {
-          this.props.setVideoDuration();
-          this.props.setVolume(e);
+          setVideoDuration();
+          setVolume(e);
         }}
-        onTimeUpdate={e => this.props.setCurrentTime(e)}
+        onTimeUpdate={e => setCurrentTime(e)}
       />
     );
   }
